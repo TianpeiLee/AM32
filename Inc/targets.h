@@ -2646,10 +2646,22 @@
  * ************************************************/
 #ifdef AIRBOT_V203
 //#define USE_PA2_AS_COMP
-#define FIRMWARE_NAME "AIRBOT_V203"
-#define FILE_NAME "AIRBOT_V203"
-#define DEAD_TIME 75
+// #define FIRMWARE_NAME "AIRBOT_V203"   //203_PA0_Bi-D
+// #define FILE_NAME "AIRBOT_V203"       //203_PA0_Bi-D  
+#define FIRMWARE_NAME "203_PA0_Bi-D"   //203_PA0_Bi-D
+#define FILE_NAME "203_PA0_Bi-D"       //203_PA0_Bi-D  
+#define DEAD_TIME 140
 #define HARDWARE_GROUP_CH_A
+#endif
+
+/*****************************************************CH32L103 targets
+ * ************************************************/
+#ifdef RELFUN_L103
+#define FIRMWARE_NAME "RELFUN_L103"
+#define FILE_NAME "RELFUN_L103"
+#define DEAD_TIME 75
+#define HARDWARE_GROUP_L103_A
+
 #endif
 
 #ifndef FIRMWARE_NAME
@@ -4523,6 +4535,32 @@
 
 #endif
 
+#ifdef HARDWARE_GROUP_L103_A
+#define MCU_CH32L103
+#define USE_SYSTICK_AS_UTILITY_TIMER
+#define INPUT_PIN GPIO_Pin_0
+#define INPUT_PIN_PORT GPIOA
+#define IC_TIMER_CHANNEL        (1-1)
+#define IC_TIMER_REGISTER       TIM2
+#define INPUT_DMA_CHANNEL       DMA1_Channel5
+#define IC_DMA_IRQ_NAME         DMA1_Channel5_IRQn
+
+#define PHASE_C_GPIO_LOW        GPIO_Pin_1
+#define PHASE_C_GPIO_PORT_LOW   GPIOB
+#define PHASE_C_GPIO_HIGH       GPIO_Pin_10
+#define PHASE_C_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_B_GPIO_LOW        GPIO_Pin_0
+#define PHASE_B_GPIO_PORT_LOW   GPIOB
+#define PHASE_B_GPIO_HIGH       GPIO_Pin_9
+#define PHASE_B_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_A_GPIO_LOW        GPIO_Pin_7
+#define PHASE_A_GPIO_PORT_LOW   GPIOA
+#define PHASE_A_GPIO_HIGH       GPIO_Pin_8
+#define PHASE_A_GPIO_PORT_HIGH  GPIOA
+#endif
+
 /************************************ MCU COMMON PERIPHERALS
  * **********************************************/
 
@@ -4783,15 +4821,15 @@
 
 #ifdef MCU_CH32V203
 #define WCH
-#define NEED_INPUT_READY
+// #define NEED_INPUT_READY
 #define ERASED_FLASH_BYTE    0x39
-#define CPU_FREQUENCY_MHZ    48                     //PWM freq is 48MHz, CPU freq is 96MHz
+#define CPU_FREQUENCY_MHZ    120                     //PWM freq is 48MHz, CPU freq is 96MHz
 #define EEPROM_START_ADD     (uint32_t)0x0800f800
 #define INTERVAL_TIMER       TIM4
 #define TEN_KHZ_TIMER        SysTick
 #define UTILITY_TIMER        TIM4
 #define COM_TIMER            TIM3                    
-#define TIM1_AUTORELOAD      1999
+// #define TIM1_AUTORELOAD      1999
 #define APPLICATION_ADDRESS  0x08001000
 
 #define TARGET_MIN_BEMF_COUNTS  3
@@ -4805,6 +4843,28 @@
 #else
   #define COMPARATOR_IRQ   EXTI2_IRQn
 #endif
+
+#endif
+
+#ifdef MCU_CH32L103
+#define WCH
+#define ERASED_FLASH_BYTE    0xFF
+#define CPU_FREQUENCY_MHZ    96   
+#define EEPROM_START_ADD     (uint32_t)0x0800f800
+#define INTERVAL_TIMER       TIM4
+#define TEN_KHZ_TIMER        LPTIM
+#define UTILITY_TIMER        SysTick
+#define COM_TIMER            TIM3   
+
+
+#define APPLICATION_ADDRESS  0x08001000
+
+#define TARGET_MIN_BEMF_COUNTS  3
+#define USE_ADC
+#define DSHOT_PRIORITY_THRESHOLD 50
+
+#define COM_TIMER_IRQ      TIM3_IRQn
+#define COMPARATOR_IRQ     EXTI3_IRQn
 
 #endif
 

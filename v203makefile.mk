@@ -9,7 +9,7 @@ TARGETS_$(MCU) := $(call get_targets,$(MCU))
 
 HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(call lc,$(MCU))
 
-MCU_$(MCU) := -march=rv32imac -mabi=ilp32 -msmall-data-limit=8 -msave-restore -nostartfiles -fmessage-length=0 -ffunction-sections -fdata-sections -fno-common -DMCU_FLASH_START=0x08000000
+MCU_$(MCU) := -march=rv32imac -mabi=ilp32 -msmall-data-limit=8 -msave-restore -nostartfiles -fmessage-length=0 -ffunction-sections -fdata-sections -fno-common -DMCU_FLASH_START=0x08000000 -DUSE_SERIAL_TELEMETRY
 LDSCRIPT_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.ld)
 
 SRC_BASE_DIR_$(MCU) := \

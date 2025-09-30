@@ -37,7 +37,7 @@ void changeToOutput()
     IC_TIMER_REGISTER->CCER    = 0x3;     // outenable
 
     IC_TIMER_REGISTER->PSC     = output_timer_prescaler;
-    IC_TIMER_REGISTER->ATRLR   = 63;                //48MHz / output_timer_prescaler / (63+1)
+    IC_TIMER_REGISTER->ATRLR   = 79;                //48MHz / output_timer_prescaler / (63+1)
     out_put = 1;
     TIM_GenerateEvent(IC_TIMER_REGISTER,TIM_EventSource_Update);
 }

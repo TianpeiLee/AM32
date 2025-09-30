@@ -24,8 +24,8 @@ include $(ROOT)/make/tools.mk
 
 # supported MCU types
 
-MCU_TYPES := E230 F031 F051 F415 F421 G071 L431 G431 V203 G031
-
+# MCU_TYPES := E230 F031 F051 F415 F421 G071 L431 G431 V203 G031 L103
+MCU_TYPES := V203 L103
 MCU_TYPE := NONE
 
 # Function to include makefile for each MCU type
@@ -46,7 +46,7 @@ FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
 # Compiler options
 
 CFLAGS_BASE := -fsingle-precision-constant -fomit-frame-pointer -ffast-math
-CFLAGS_BASE += -I$(MAIN_INC_DIR) -g3 -O3 -ffunction-sections --specs=nosys.specs
+CFLAGS_BASE += -I$(MAIN_INC_DIR) -g3 -Os -ffunction-sections --specs=nosys.specs
 CFLAGS_BASE += -Wall -Wundef -Wextra -Werror -Wno-unused-parameter -Wno-stringop-truncation
 
 CFLAGS_COMMON := $(CFLAGS_BASE)

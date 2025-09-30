@@ -69,7 +69,7 @@ void AT_COMP_Init(void)
      GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
      GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-     GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_2;              //ÖÐ¶Ï»ãÈë¿Ú
+     GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_2;              
      GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
      GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -88,7 +88,7 @@ void AT_COMP_Init(void)
      EXTI_Init(&EXTI_InitStructure);
      EXTI_ClearITPendingBit(EXTI_Line2);
 
-     SetVTFIRQ( (uint32_t)EXTI2_IRQHandler,EXTI2_IRQn,1,ENABLE  );  //¹ýÁã±È½ÏÖÐ¶ÏÉèÖÃÎªÃâ±íÖÐ¶Ï
+     SetVTFIRQ( (uint32_t)EXTI2_IRQHandler,EXTI2_IRQn,1,ENABLE  );  //ï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
 
      NVIC_SetPriority(EXTI2_IRQn, 0);
      NVIC_EnableIRQ(EXTI2_IRQn);
@@ -102,7 +102,7 @@ void AT_COMP_Init(void)
      EXTI_Init(&EXTI_InitStructure);
      EXTI_ClearITPendingBit(EXTI_Line3);
 
-     SetVTFIRQ( (uint32_t)EXTI3_IRQHandler,EXTI3_IRQn,1,ENABLE  );  //¹ýÁã±È½ÏÖÐ¶ÏÉèÖÃÎªÃâ±íÖÐ¶Ï
+     SetVTFIRQ( (uint32_t)EXTI3_IRQHandler,EXTI3_IRQn,1,ENABLE  );  //ï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
 
      NVIC_SetPriority(EXTI3_IRQn, 0x20);
      NVIC_EnableIRQ(EXTI3_IRQn);
@@ -116,7 +116,7 @@ void AT_COMP_Init(void)
      EXTI_Init(&EXTI_InitStructure);
      EXTI_ClearITPendingBit(EXTI_Line4);
 
-     SetVTFIRQ( (uint32_t)EXTI4_IRQHandler,EXTI4_IRQn,2,ENABLE  );  //¹ýÁã±È½ÏÖÐ¶ÏÉèÖÃÎªÃâ±íÖÐ¶Ï
+     SetVTFIRQ( (uint32_t)EXTI4_IRQHandler,EXTI4_IRQn,2,ENABLE  );  //ï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
 
      NVIC_SetPriority(EXTI4_IRQn, 0x20);
      NVIC_EnableIRQ(EXTI4_IRQn);
@@ -142,7 +142,7 @@ void TIM1_Init(void)
     RCC_APB2PeriphClockCmd( RCC_APB2Periph_TIM1|RCC_APB2Periph_AFIO, ENABLE );
     GPIO_PinRemapConfig(GPIO_PartialRemap_TIM1, ENABLE);
 
-    TIM_InitStruct.TIM_Period = 2000-1;
+    TIM_InitStruct.TIM_Period = TIM1_AUTORELOAD;
     TIM_InitStruct.TIM_Prescaler = 0;
     TIM_InitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_InitStruct.TIM_CounterMode = TIM_CounterMode_Up;
@@ -248,7 +248,7 @@ void Intervak_TIM4_Init(void) //INTERVAL_TIMER
 {
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE );
     TIM4->ATRLR = 0xFFFF;
-    TIM4->PSC = 23;        //0.5us
+    TIM4->PSC = CPU_FREQUENCY_MHZ / 2 - 1;        //0.5us
 }
 
 //actual frequency is 20KHz
@@ -257,7 +257,7 @@ void TenkHz_SysTick_Init(void) //TEN_KHZ_TIMER
     SysTick->CTLR = 0;
     SysTick->SR   = 0;
     SysTick->CNT  = 0;
-    SysTick->CMP  = SystemCoreClock / LOOP_FREQUENCY_HZ;
+    SysTick->CMP  = SystemCoreClock / LOOP_FREQUENCY_HZ - 1;
     SysTick->CTLR = 0xF;
     NVIC_SetPriority(SysTicK_IRQn, 0xE0);
     NVIC_EnableIRQ(SysTicK_IRQn);
@@ -266,7 +266,7 @@ void TenkHz_SysTick_Init(void) //TEN_KHZ_TIMER
 void COM_TIM3_Init(void)   //COM
 {
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE );
-    TIM3->PSC  = 23;
+    TIM3->PSC  = CPU_FREQUENCY_MHZ / 2 - 1;
     TIM3->ATRLR=4000;
     NVIC_SetPriority(TIM3_IRQn, 0);
     NVIC_EnableIRQ(TIM3_IRQn);
@@ -319,7 +319,7 @@ void UN_TIM2_Init(void) //IC Timer Init
     TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
     TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
     TIM_ICInitStructure.TIM_ICFilter = 0x00;
-    TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;       //´ÓÉÏÉýÑØ¿ªÊ¼
+    TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;       //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¿ï¿½Ê¼
     TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
     TIM_ICInit(TIM2, &TIM_ICInitStructure);
 
@@ -478,6 +478,6 @@ void enableCorePeripherals()
 #endif
 
 //    soft irq to trigger process dshot
-//    NVIC_SetPriority(Software_IRQn, 0xC0);
-//    NVIC_EnableIRQ(Software_IRQn);
+   NVIC_SetPriority(Software_IRQn, 0xC0);
+   NVIC_EnableIRQ(Software_IRQn);
 }

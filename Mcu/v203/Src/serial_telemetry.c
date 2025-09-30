@@ -15,11 +15,21 @@ void send_telem_DMA(uint8_t bytes)
 {
     // set data length and enable channel to start transfer
     // set data length and enable channel to start transfer
-    MODIFY_REG(USART2->CTLR1, USART_CTLR1_RE | USART_CTLR1_TE, USART_CTLR1_TE);  //ʹ�ܷ���
+#ifdef USE_AFOD_OUT    
+    MODIFY_REG(USART2->CTLR1, USART_CTLR1_RE | USART_CTLR1_TE, USART_CTLR1_TE);  
     DMA1_Channel7->CNTR  = bytes;
-    DMA1_Channel7->MADDR = (uint32_t)&aTxBuffer[0];  //DMA��ַ�����ģ���Ҫ��������
+    DMA1_Channel7->MADDR = (uint32_t)&aTxBuffer[0]; 
     USART_DMACmd(USART2,USART_DMAReq_Tx,ENABLE);
     DMA_Cmd(DMA1_Channel7, ENABLE);
+#else
+    DMA_Cmd(DMA1_Channel7, DISABLE);
+    DMA1_Channel7->CNTR  = bytes;
+    DMA1_Channel7->MADDR = (uint32_t)&aTxBuffer[0]; 
+    GPIOA->CFGLR &= ~(0xF<<8);
+    GPIOA->CFGLR |= (0xB<<8);
+    USART_DMACmd(USART2,USART_DMAReq_Tx,ENABLE);
+    DMA_Cmd(DMA1_Channel7, ENABLE);
+#endif
 }
 
 void telem_UART_Init(void)
@@ -35,7 +45,11 @@ void telem_UART_Init(void)
     /* configure the usart2 tx pin */
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
+#ifdef  USE_AFOD_OUT   
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_OD; 
+#else
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU; 
+#endif   
     GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     USART_InitStruct.USART_BaudRate            = 115200;
@@ -68,6 +82,11 @@ void telem_UART_Init(void)
     DMA_ClearFlag(DMA1_FLAG_TC7|DMA1_FLAG_TE7|DMA1_FLAG_HT7);
     DMA_ITConfig(DMA1_Channel7, DMA_IT_TC|DMA_IT_TE, ENABLE);
 
-    NVIC_SetPriority(DMA1_Channel7_IRQn, 0xE0);  //��������ж�
+    NVIC_SetPriority(DMA1_Channel7_IRQn, 0xE0); 
     NVIC_EnableIRQ(DMA1_Channel7_IRQn);
+
+#ifndef  USE_AFOD_OUT   
+    NVIC_SetPriority(USART2_IRQn, 0xE0);  
+    NVIC_EnableIRQ(USART2_IRQn);
+#endif
 }

@@ -74,7 +74,7 @@ void ADCInit(void)
 
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-    RCC_ADCCLKConfig(RCC_PCLK2_Div2);    //frequency is 48MHz
+    RCC_ADCCLKConfig(RCC_PCLK2_Div6);   
 
    /**ADC GPIO Configuration
    PA1   ------> ADC_IN1

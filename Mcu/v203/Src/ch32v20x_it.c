@@ -49,6 +49,7 @@ void EXTI4_IRQHandler(void)  __attribute__((interrupt("WCH-Interrupt-fast")));
 #endif
 //for tele DMA
 void DMA1_Channel7_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void USART2_IRQHandler(void)__attribute__((interrupt("WCH-Interrupt-fast")));
 //for com
 void TIM3_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 //dor dshot
@@ -117,21 +118,23 @@ void DMA1_Channel5_IRQHandler(void)
         CLEAR_BIT(INPUT_DMA_CHANNEL->CFGR,0x1);  //disable DMA1_CH5
         transfercomplete();
         DMA1->INTFCR = DMA1_IT_TC5;
-        input_ready = 1;
+        NVIC_SetPendingIRQ(Software_IRQn);
+        // input_ready = 1;
     }
     /* Check whether DMA transfer error caused the DMA interruption */
     if( DMA1->INTFR & DMA1_IT_TE5)
     {
         CLEAR_BIT(INPUT_DMA_CHANNEL->CFGR,0x1);  //disable DMA1_CH5
         DMA_ClearFlag(DMA1_IT_TE5);
-        transfercomplete( );
-        input_ready = 1;
+        // transfercomplete( );
+        // input_ready = 1;
     }
 }
 
 //for tele
 void DMA1_Channel7_IRQHandler(void)
 {
+#ifdef USE_AFOD_OUT
     if(DMA_GetITStatus(DMA1_IT_TC7))
     {
         USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
@@ -147,7 +150,37 @@ void DMA1_Channel7_IRQHandler(void)
         DMA_Cmd(DMA1_Channel7, DISABLE);
         DMA_ClearFlag(DMA1_IT_TE7);
     }
+#else
+    if(DMA_GetITStatus(DMA1_IT_TC7))
+    {
+        USART_ITConfig(USART2, USART_IT_TC, ENABLE);
+        DMA_Cmd(DMA1_Channel7, DISABLE);
+        USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
+        DMA_ClearFlag(DMA1_IT_TC7);
+    }
+    if(DMA_GetITStatus(DMA1_IT_TE7))
+    {
+        GPIOA->BSHR = GPIO_Pin_2;
+        GPIOA->CFGLR &= ~(0xF<<8);
+        GPIOA->CFGLR |= (0x8<<8);
+        DMA_Cmd(DMA1_Channel7, DISABLE);
+        USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
+        DMA_ClearFlag(DMA1_IT_TE7);
+    }
+#endif
 }
+
+void USART2_IRQHandler(void)
+{
+    if(USART_GetITStatus(USART2, USART_IT_TC) != RESET)
+    {
+        GPIOA->BSHR = GPIO_Pin_2;
+        GPIOA->CFGLR &= ~(0xF<<8);
+        GPIOA->CFGLR |= (0x8<<8);  
+        USART_ITConfig(USART2, USART_IT_TC, DISABLE);
+    }
+}
+
 
 //for tenkhz
 void SysTick_Handler(void)
@@ -192,10 +225,15 @@ void EXTI4_IRQHandler(void)
 //for com
 void TIM3_IRQHandler(void)
 {
-    if(TIM_GetITStatus(TIM3,TIM_IT_Update))
+    // if(TIM_GetITStatus(TIM3,TIM_IT_Update))
+    // {
+    //     TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+    //     PeriodElapsedCallback( );
+    // }
+    if( TIM3->INTFR & TIM_IT_Update)
     {
+        TIM3->INTFR = (uint16_t)~TIM_IT_Update;
         PeriodElapsedCallback( );
-        TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
     }
 }
 
@@ -203,5 +241,5 @@ void TIM3_IRQHandler(void)
 //for processDshot
 void SW_Handler(void)
 {
-//   processDshot();
+    processDshot();
 }

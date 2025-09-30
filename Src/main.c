@@ -1852,7 +1852,7 @@ if(zero_crosses < 5){
         RELOAD_WATCHDOG_COUNTER();
 
         if (eepromBuffer.variable_pwm == 1) {      // uses range defined by pwm frequency setting
-            tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2,
+            tim1_arr = map(commutation_interval, 96, 420, TIMER1_MAX_ARR / 2,
                 TIMER1_MAX_ARR);
         }
         if (eepromBuffer.variable_pwm == 2) {      // uses automatic range   

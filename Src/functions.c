@@ -59,7 +59,11 @@ static inline uint16_t get_timer_us16(void) {
 #elif defined(ARTERY)
     return UTILITY_TIMER->cval;
 #elif defined(WCH)
+    #ifdef USE_SYSTICK_AS_UTILITY_TIMER
+    return (uint16_t)((uint64_t)(UTILITY_TIMER->CNT) / CPU_FREQUENCY_MHZ) ;  
+    #else    
     return UTILITY_TIMER->CNT>>1;
+    #endif
 #else
 #error unsupported MCU
 #endif
